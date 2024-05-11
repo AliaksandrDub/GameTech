@@ -1,0 +1,49 @@
+#!/bin/bash
+
+# Объявление переменных
+REPO="https://https://github.com/AliaksandrDub/GameTech.git/configurations.git"
+EMAIL="specreview.team@gmail.com"
+
+# Функции для установки компонентов
+install_software() {
+    echo "Установка Apache, MySQL, PHP и Nginx..."
+    sudo apt update && sudo apt install -y apache2 mysql-server php libapache2-mod-php nginx git
+}
+
+# Клонирование конфигураций и настройка веб-серверов
+setup_servers() {
+    echo "Настройка серверов..."
+    git clone $REPO /tmp/configs
+    sudo cp /tmp/configs/wordpress.conf /etc/apache2/sites-available/
+    sudo cp /tmp/configs/joomla.conf /etc/apache2/sites-available/
+    sudo cp /tmp/configs/nginx.conf /etc/nginx/sites-available/default
+    sudo a2ensite wordpress.conf joomla.conf
+    sudo systemctl restart apache2
+    sudo systemctl restart nginx
+}
+
+# Установка CMS
+setup_cms() {
+    echo "Установка CMS..."
+    sudo wget -P /var/www/html https://wordpress.org/latest.tar.gz
+    sudo tar -xzf /var/www/html/latest.tar.gz -C /var/www/html/
+    sudo wget -P /var/www/html https://downloads.joomla.org/latest/stable/full_package.zip
+    sudo unzip /var/www/html/full_package.zip -d /var/www/html/joomla
+    sudo chown -R www-data:www-data /var/www/html/wordpress /var/www/html/joomla
+}
+
+# Отправка уведомления
+send_notification() {
+    echo "Установка завершена" | mail -s "Установка стека на сервере завершена" $EMAIL
+}
+
+# Обработка ошибок и запуск
+trap 'echo "Произошла ошибка. Проверьте журналы." | mail -s "Ошибка установки" $EMAIL' ERR
+
+install_software
+setup_servers
+setup_cms
+send_notification
+
+echo "Развертывание завершено успешно."
+
