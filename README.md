@@ -35,12 +35,12 @@ Bash скрипт для настройки следующих компонен�
 - Docker Compose для оркестрации много-контейнерных приложений.
 - Перенос на Podman для использования в средах, где требуется работа без демона Docker.
 
-[Docker Compose]()
+[Docker Compose](https://github.com/AliaksandrDub/GameTech/blob/main/Task_3.0/docker-compose.yml)
 
 ""В директории Task_3.0 находятся файлы конфигурации, которые играют ключевую роль в настройке и управлении вашими приложениями или системами.""
 
 ### Команды 
-\```bash
+```
 sudo apt update
 sudo apt install apt-transport-https ca-certificates curl software-properties-common
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
@@ -53,7 +53,7 @@ sudo chmod +x /usr/local/bin/docker-compose
 
 cd path_to_your_compose_file
 docker-compose up --build
-\```
+```
 
 ### Комментарий
 
