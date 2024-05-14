@@ -1,0 +1,9 @@
+all:
+  children:
+    work_sa:
+      hosts:
+        host1:
+          ansible_host:
+        host2:
+          ansible_host: 
+

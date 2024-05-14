@@ -1,0 +1,59 @@
+---
+- name: Deploy web stack
+  hosts: all
+  become: yes
+  vars:
+    db_type: "mariadb"  # Или postgresql
+    web_server: "nginx"  # Или другой прокси-сервер
+
+  tasks:
+    - name: Install Apache and PHP
+      apt:
+        name: "{{ item }}"
+        state: latest
+      loop:
+        - apache2
+        - php
+        - libapache2-mod-php
+        - php-mysql
+
+    - name: Install Database Server
+      apt:
+        name: "{{ 'mariadb-server' if db_type == 'mariadb' else 'postgresql' }}"
+        state: latest
+
+    - name: Configure Apache for WordPress and Joomla
+      template:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+      loop:
+        - { src: 'wordpress.conf.j2', dest: '/etc/apache2/sites-available/wordpress.conf' }
+        - { src: 'joomla.conf.j2', dest: '/etc/apache2/sites-available/joomla.conf' }
+      notify:
+        - restart apache2
+
+    - name: Install Nginx as a reverse proxy
+      apt:
+        name: nginx
+        state: latest
+      notify:
+        - restart nginx
+
+    - name: Deploy configurations for Nginx
+      template:
+        src: "nginx.conf.j2"
+        dest: "/etc/nginx/nginx.conf"
+      notify:
+        - restart nginx
+
+  handlers:
+    - name: restart apache2
+      service:
+        name: apache2
+        state: restarted
+
+    - name: restart nginx
+      service:
+        name: nginx
+        state: restarted
+
